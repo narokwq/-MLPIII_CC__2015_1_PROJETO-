@@ -1,4 +1,4 @@
-package unipe.pmf.ui;
+package unipe.mpf.ui;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
