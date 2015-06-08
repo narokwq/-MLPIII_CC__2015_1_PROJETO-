@@ -1,4 +1,4 @@
-package unipe.mpf.dados;
+package unipe.mpf.dados.exceptions;
 
 public class ContaJaCadastradaException extends Exception{
 

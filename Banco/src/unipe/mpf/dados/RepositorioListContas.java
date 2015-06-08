@@ -1,50 +1,50 @@
 package unipe.mpf.dados;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import unipe.mpf.contas.Conta;
 import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
 import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
 
-public class RepositorioContas implements IRepositorioContas {
+public class RepositorioListContas implements IRepositorioContas {
 
-	@Override
+	List<Conta> contas = new ArrayList<>();
+	
 	public void inserir(Conta conta) throws ContaJaCadastradaException {
-		throw new ContaJaCadastradaException("Conta já existe!");
-		
+		contas.add(conta);
+
 	}
 
 	@Override
 	public Conta procura(Conta conta) throws ContaNaoEcontradaException {
-		//throw new ContaNaoEcontradaException("Conta não encontrada!");
-		return null;
-	}
-
-	@Override
-	public void atualizar(Conta conta) throws ContaNaoEcontradaException {
-		throw new ContaNaoEcontradaException("Conta não encontrada!");
-		
-	}
-
-	@Override
-	public void remover(Conta conta) throws ContaNaoEcontradaException {
-		throw new ContaNaoEcontradaException("Conta não encontrada!");
-		
-	}
-
-	@Override
-	public void existe(Conta conta) throws ContaNaoEcontradaException {
-		throw new ContaNaoEcontradaException("Conta não encontrada!");
-		
+		for(Conta aux: contas)
+			if(conta.getConta() == aux.getConta())
+				return aux;
+		throw new ContaNaoEcontradaException("Conta não encontrada");
 	}
 
 	@Override
 	public List<Conta> listar() {
-		// TODO Auto-generated method stub
-		return Collections.emptyList();
+		return contas;
 	}
 
-	
+	@Override
+	public void atualizar(Conta conta) throws ContaNaoEcontradaException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void remover(Conta conta) throws ContaNaoEcontradaException {
+		contas.remove(conta);
+
+	}
+
+	@Override
+	public void existe(Conta conta) throws ContaNaoEcontradaException {
+		
+
+	}
 
 }

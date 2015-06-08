@@ -1,12 +1,14 @@
 package unipe.mpf.contas;
 
 public abstract class Conta {
-	protected String nConta;
+	protected int id;
+	protected String conta;
 	protected double saldo;
+	protected String nome;
 	protected float taxa;
 	
 	public Conta(String numero, double saldo, float taxa){
-		this.nConta = numero;
+		this.conta = numero;
 		this.taxa = taxa;
 		creditar(saldo);		
 	}
@@ -19,11 +21,26 @@ public abstract class Conta {
 		this(numero, 0, 0);
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
 	public String getConta() {
-		return nConta;
+		return conta;
 	}
 	public void setConta(String nConta) {
-		this.nConta = nConta;
+		this.conta = nConta;
 	}
 	public double getSaldo() {
 		return saldo;
@@ -53,7 +70,7 @@ public abstract class Conta {
 	
 	@Override
 	public String toString() {
-		return "Conta [nConta=" + nConta + ", saldo=" + saldo + "]";
+		return "Conta [nConta=" + conta + ", saldo=" + saldo + "]";
 	}
 	
 }
