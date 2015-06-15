@@ -3,22 +3,26 @@ package unipe.mpf.contas;
 public abstract class Conta {
 	protected int id;
 	protected String conta;
-	protected double saldo;
 	protected String nome;
-	protected float taxa;
+	protected double saldo;
 	
-	public Conta(String numero, double saldo, float taxa){
+	public Conta(){
+
+	}
+	public Conta(int id, String numero, String nome, double saldo){
 		this.conta = numero;
-		this.taxa = taxa;
-		creditar(saldo);		
+		this.nome = nome;
+		this.id = id;
+		if(saldo > 1)
+			creditar(saldo);
 	}
 	
-	public Conta(String numero, double saldo){
-		this(numero, saldo, 0);
+	public Conta(String numero, String nome, double saldo){
+		this(0, numero, nome, saldo);		
 	}
 	
-	public Conta(String numero){
-		this(numero, 0, 0);
+	public Conta(String numero, String nome){
+		this(0, numero, nome, 0);
 	}
 	
 	public int getId() {
@@ -45,7 +49,10 @@ public abstract class Conta {
 	public double getSaldo() {
 		return saldo;
 	}
-	
+	public void setSaldo(double valor) {
+		this.saldo = valor;
+		
+	}
 	public boolean debitar(float valor) {
 		if(valor < saldo){
 			this.saldo -= valor;
@@ -58,19 +65,11 @@ public abstract class Conta {
 		this.saldo += valor;
 	}
 	
-	public float getTaxa() {
-		return taxa;
-	}
-	public void setTaxa(float taxa) {
-		this.taxa = taxa;
-	}
-	public void atualizar() {
-		this.saldo += this.saldo*taxa;
-	}
-	
 	@Override
 	public String toString() {
 		return "Conta [nConta=" + conta + ", saldo=" + saldo + "]";
 	}
+
+	
 	
 }

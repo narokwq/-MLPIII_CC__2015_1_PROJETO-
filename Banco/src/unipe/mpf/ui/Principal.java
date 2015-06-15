@@ -8,8 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -26,12 +26,15 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 
+import javax.swing.SwingWorker;
 
 import unipe.mpf.contas.Conta;
 import unipe.mpf.contas.ContaBancaria;
 import unipe.mpf.contas.ContaCorrente;
-import unipe.mpf.dados.RepositorioListContas;
+import unipe.mpf.dados.RepositorioContas;
 import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
+import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
+import unipe.mpf.facade.Banco;
 
 public class Principal {
 	private JFrame jfrm;
@@ -43,24 +46,25 @@ public class Principal {
 	private JMenu jMenuFerramenta;
 	private JPopupMenu popupMenu;
 	private JMenu jMenuAjuda;
-
+	public Banco banco;
 	
 	public static void main(String[] args) {
 		Principal principal = new Principal();
 		principal.montaTela();
-	
+		principal.carregarBanco();
 		//--------------------Teste Tabela--------------------
-		Conta conta = new ContaCorrente("36665", 60.0f);
-		conta.setNome("Alex");
-		ContaBancaria bancaria = new ContaBancaria(new RepositorioListContas());
-		for(int i = 0; i < 10; i++)
-			try {
-				bancaria.cadastrarConta(conta);
-			} catch (ContaJaCadastradaException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-		}
-		principal.addModel(new ContaTableModel(bancaria.listarConta()));
+//		for(int i = 0; i < 10000000; i++){
+//			Conta conta = new ContaCorrente(""+i, "a", 60.0);
+//			try {
+//				principal.banco.cadastrarConta(conta);
+//				System.out.println(i);
+//			} catch (ContaJaCadastradaException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//		}
+		
 		//--------------------Fim do Teste--------------------
 
 	}
@@ -176,6 +180,8 @@ public class Principal {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				String nome = jTNumero.getText().trim();
+				buscarDadosThead(nome);
 				
 				
 			}
@@ -191,7 +197,14 @@ public class Principal {
 			public void actionPerformed(ActionEvent e) {
 				int rowSelecionada = jtableConta.getSelectedRow();
 				if(rowSelecionada >= 0){
-					model.removeRow(rowSelecionada);
+					Conta conta = model.getContaAt(rowSelecionada);
+					try {
+						banco.removerConta(conta);
+						model.removeRow(rowSelecionada);
+					} catch (ContaNaoEcontradaException e1) {
+						JOptionPane.showMessageDialog(jfrm, "Conta não encontrada");
+					}
+					
 				}else{
 					JOptionPane.showMessageDialog(jfrm, "Nenhuma conta selecionada!");
 				}
@@ -225,6 +238,7 @@ public class Principal {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				System.out.println(jtableConta.getSelectedRow());
 				Conta conta = model.getContaAt(jtableConta.getSelectedRow());
 				new TelaModificar(jfrm, conta).mostarTela();
 				
@@ -255,11 +269,9 @@ public class Principal {
 		});
 	}
 	
-	
-	
-	public void addModel(ContaTableModel model){
-		this.model = model;
-		jtableConta.setModel(model);
+	public void carregarBanco(){
+		banco = new Banco(new ContaBancaria(new RepositorioContas()));
+		buscarDadosThead("");
 	}
 	
 	
@@ -279,5 +291,31 @@ public class Principal {
 	        int currentRow = table.rowAtPoint(point);
 	        table.setRowSelectionInterval(currentRow, currentRow);
 	    }
+	}
+	
+	private void buscarDadosThead(String conta){
+		final String BuscaConta = conta;
+		SwingWorker<List<Conta>, Void> worker = new SwingWorker<List<Conta>, Void>() {
+				 @Override
+				 protected List<Conta> doInBackground() throws Exception {
+
+					 return banco.getContas(BuscaConta);		
+				 }
+
+				 protected void done() {
+					 try {
+						 model = new ContaTableModel(get());
+						 jtableConta.setModel(model);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			
+				 }			
+		};
+		worker.execute();
 	}
 }

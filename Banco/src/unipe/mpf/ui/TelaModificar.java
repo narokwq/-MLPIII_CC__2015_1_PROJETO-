@@ -7,10 +7,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -18,17 +21,39 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import unipe.mpf.contas.Conta;
+import unipe.mpf.contas.ContaBancaria;
+import unipe.mpf.contas.ContaCorrente;
+import unipe.mpf.dados.RepositorioContas;
+import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
+import unipe.mpf.facade.Banco;
 
 public class TelaModificar {
 	private JDialog fDialog;
 	private JPanel jPanelCadastro;
-	private JTextField jTNumero;
+	private JTextField jFieldBuscaNumero;
 	private JTextField jFieldNumero;
 	private JTextField jFieldNome;
-	private JTextField jFieldSaldo;
+	private JFormattedTextField jFieldSaldo;
 	private JPanel jPanelButton;
 	private JPanel jPanelBusca;
+	private Banco banco;
+	private int id;
 	
+	private void setAtributos(Conta conta){
+		this.id = conta.getId();
+		jFieldBuscaNumero.setText(conta.getConta());
+		jFieldNumero.setText(conta.getConta());
+		jFieldNome.setText(conta.getNome());
+		jFieldSaldo.setValue(conta.getSaldo());
+	}
+	
+	private void limparAtributos(){
+		this.id = -1;
+		jFieldBuscaNumero.setText("");
+		jFieldNumero.setText("");
+		jFieldNome.setText("");
+		jFieldSaldo.setText("");
+	}
 	
 	public TelaModificar(JFrame pai){
 		preparaTela(pai);
@@ -40,14 +65,13 @@ public class TelaModificar {
 		preparaPanelButton();
 		preparaButtonSalvar();
 		preparaButtonCancelar();
+		
+		banco = new Banco(new ContaBancaria(new RepositorioContas()));
 	}
 	
 	public TelaModificar(JFrame pai, Conta conta){
 		this(pai);
-		jTNumero.setText(conta.getConta());
-		jFieldNumero.setText(conta.getConta());
-		jFieldNome.setText(conta.getNome());
-		jFieldSaldo.setText(String.format("%.2f", conta.getSaldo()));
+		setAtributos(conta);
 	}
 	
 	public void mostarTela(){	
@@ -116,8 +140,8 @@ public class TelaModificar {
 	
 	
 	private void preparaTextFieldBusca(){
-		jTNumero = new JTextField(10);
-		jPanelBusca.add(jTNumero);
+		jFieldBuscaNumero = new JTextField(10);
+		jPanelBusca.add(jFieldBuscaNumero);
 	}
 	
 	private void preparaBotaoBusca(){
@@ -126,8 +150,14 @@ public class TelaModificar {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				
+				Conta conta = new ContaCorrente();
+				conta.setConta(jFieldBuscaNumero.getText().trim());
+				try {
+					setAtributos(banco.procurarConta(conta));
+				} catch (ContaNaoEcontradaException e1) {
+					JOptionPane.showMessageDialog(fDialog, e1.getMessage());
+					limparAtributos();
+				}
 			}
 		});
 		jPanelBusca.add(jBBusca);
@@ -149,7 +179,8 @@ public class TelaModificar {
 	}
 	
 	private void preparaFieldSaldo(GridBagConstraints gc){
-		jFieldSaldo = new JTextField(6);
+		jFieldSaldo = new JFormattedTextField(new DecimalFormat("#.##"));
+		jFieldSaldo.setColumns(6);
 		jPanelCadastro.add(jFieldSaldo, gc);
 	}
 	
@@ -176,7 +207,17 @@ public class TelaModificar {
 			public void actionPerformed(ActionEvent e) {
 				int opcao = JOptionPane.showConfirmDialog(fDialog, "Tem certeza que deseja editar essa conta!", "Warning", 
 														JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-				if(opcao == 0){
+				if(opcao == 0 && !jFieldNumero.getText().trim().equals("")){
+					try {
+						String nConta = jFieldNumero.getText().trim();
+						String nome = jFieldNome.getText().trim();
+						Number valor = (Number)jFieldSaldo.getValue();
+						double saldo = valor.doubleValue();
+						banco.atualizarConta(new ContaCorrente(id, nConta, nome, saldo));
+					} catch (ContaNaoEcontradaException e1) {
+						JOptionPane.showMessageDialog(fDialog, e1.getMessage());
+						limparAtributos();					
+					}
 					
 				}
 				

@@ -7,20 +7,31 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import unipe.mpf.contas.ContaBancaria;
+import unipe.mpf.contas.ContaCorrente;
+import unipe.mpf.dados.RepositorioContas;
+import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
+import unipe.mpf.facade.Banco;
 
 public class TelaCadastrar {
 	private JDialog fDialog;
 	private JPanel jPanelCadastro;
 	private JTextField jFieldNumero;
 	private JTextField jFieldNome;
-	private JTextField jFieldSaldo;
+	private JFormattedTextField jFieldSaldo;
+//	private JTextField jFieldSaldo;
 	private JPanel jPanelButton;
 	
 	public TelaCadastrar(JFrame pai){
@@ -100,7 +111,8 @@ public class TelaCadastrar {
 	}
 	
 	private void preparaFieldSaldo(GridBagConstraints gc){
-		jFieldSaldo = new JTextField(6);
+		jFieldSaldo = new JFormattedTextField(new DecimalFormat("#.##"));
+		jFieldSaldo.setColumns(6);
 		jPanelCadastro.add(jFieldSaldo, gc);
 	}
 	
@@ -118,6 +130,23 @@ public class TelaCadastrar {
 	private void preparaButtonSalvar(){
 		JButton jBSalvar = new JButton("Salvar");
 		jPanelButton.add(jBSalvar);
+		jBSalvar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Banco banco = new Banco(new ContaBancaria(new RepositorioContas()));
+				String nConta = jFieldNumero.getText().trim();
+				String nome = jFieldNome.getText().trim();
+				double saldo = Double.parseDouble(jFieldSaldo.getText().trim());
+				try {
+					banco.cadastrarConta(new ContaCorrente(nConta, nome, saldo));
+					JOptionPane.showMessageDialog(fDialog, "Conta Cadastrada Com Sucesso!!");
+					
+				} catch (ContaJaCadastradaException e1) {
+					JOptionPane.showMessageDialog(fDialog, e1.getMessage());
+				}			
+			}
+		});
 	}
 	
 	private void preparaButtonCancelar(){

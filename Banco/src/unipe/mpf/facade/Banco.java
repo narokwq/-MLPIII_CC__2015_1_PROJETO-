@@ -38,8 +38,9 @@ public class Banco {
 	public void removerConta(Conta conta) throws ContaNaoEcontradaException{
 		contaBancaria.removerConta(conta);
 	}
-	
-	public List<Conta> listarContas() {
-		return contaBancaria.listarConta();
+
+	public List<Conta> getContas(String nome) {
+		return contaBancaria.procurarContas(nome);
+		
 	}
 }

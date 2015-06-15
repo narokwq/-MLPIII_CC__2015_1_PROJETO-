@@ -1,7 +1,9 @@
 package unipe.mpf.ui;
 
-import java.text.DecimalFormat;
+
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -57,7 +59,7 @@ public class ContaTableModel extends AbstractTableModel{
 		return valores.get(row);
 	}
 	public void removeRow(int row){
-		valores.remove(row);	
+		valores.remove(row);
 		this.fireTableRowsDeleted(row, row);
 	}
 }

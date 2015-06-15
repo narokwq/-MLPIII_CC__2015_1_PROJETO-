@@ -7,10 +7,10 @@ import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
 import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
 
 public interface IRepositorioContas {
-	void inserir(Conta conta) throws ContaJaCadastradaException;
-	Conta procura(Conta conta)throws ContaNaoEcontradaException;
-	List<Conta> listar();
-	void atualizar(Conta conta)throws ContaNaoEcontradaException;
-	void remover(Conta conta)throws ContaNaoEcontradaException;
-	void existe(Conta conta)throws ContaNaoEcontradaException;
+	void inserir(Conta conta);
+	Conta procura(Conta conta);
+	void atualizar(Conta conta);
+	void remover(Conta conta);
+	List<Conta> listar(String nome);
+	boolean existe(Conta conta);
 }

@@ -1,26 +1,27 @@
 package unipe.mpf.contas;
 
 public class ContaCorrente extends Conta{
-	private static int TAXA_CONTA_CORRENTE = 2; 
 	
-	public ContaCorrente(String numero) {
-		super(numero);
+	public ContaCorrente() {
+		super();
 	}
-	public ContaCorrente(String numero, double saldo, float taxa) {
-		super(numero, saldo, taxa);
+	
+	public ContaCorrente(int id, String numero, String nome, double saldo) {
+		super(id, numero, nome, saldo);
 	}
-	public ContaCorrente(String numero, double saldo) {
-		super(numero, saldo);
+	
+	public ContaCorrente(String numero, String nome, double saldo) {
+		super(numero, nome, saldo);
 	}
-
+	
+	public ContaCorrente(String numero, String nome) {
+		super(numero, nome);
+	}
 
 	public void creditar(double valor){
 		if(valor>0){
-			this.saldo += (valor-0.10f);
+			this.saldo += (valor-0.1);
 		}
 	}
 	
-	public void atualizar() {
-		this.saldo += TAXA_CONTA_CORRENTE*taxa*this.saldo;
-	}
 }
