@@ -9,16 +9,11 @@ public class ContaCorrenteTeste extends TestCase {
 	Conta conta;
 	protected void setUp(){
 		conta = new ContaCorrente();
-		conta.setConta("00001");
+		conta.setId(1);
 	}
 	
 	protected void tearDown(){
 		conta = null;
-	}
-	
-	public void testCreditarInicial(){
-		conta.creditar(100.1);
-		assertEquals(conta.getSaldo(), 100.1-0.1);
 	}
 	
 	public void testCreditar(){
@@ -32,9 +27,10 @@ public class ContaCorrenteTeste extends TestCase {
 	}
 	
 	public void testConta(){
-		Conta conta = new ContaCorrente();
-		conta.setConta("00001");
-		assertNotSame(this.conta, conta);
+		Conta conta2 = new ContaCorrente();
+		conta2.setId(1);
+		assertNotSame(this.conta, conta2);
+		assertEquals(conta, conta2);
 	}
 	
 }

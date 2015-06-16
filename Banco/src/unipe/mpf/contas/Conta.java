@@ -63,6 +63,16 @@ public abstract class Conta {
 	public void creditar(double valor) {
 		this.saldo += valor;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		Conta other = (Conta) obj;
+		if (id != other.id)
+			return false;
+		
+		return true;
+	}
+	
 	@Override
 	public String toString() {
 		return "Conta [id=" + id + ", conta=" + conta + ", nome=" + nome
