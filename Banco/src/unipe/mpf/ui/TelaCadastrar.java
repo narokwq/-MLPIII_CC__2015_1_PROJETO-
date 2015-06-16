@@ -90,6 +90,12 @@ public class TelaCadastrar {
 		
 	}
 	
+	private void limparAtributos(){
+		jFieldNumero.setText("");
+		jFieldNome.setText("");
+		jFieldSaldo.setText("");
+	}
+	
 	public void MostarTela(){	
 		fDialog.setVisible(true);
 	}
@@ -141,15 +147,18 @@ public class TelaCadastrar {
 				
 				double saldo = 0;
 				if(!nConta.equals("") && !nome.equals("")){
-					if(!stringSaldo.equals(""))
-						saldo = Double.parseDouble(stringSaldo.replace(',', '.'));
+					
 					try {
+						if(!stringSaldo.equals(""))
+							saldo = Double.parseDouble(stringSaldo.replace(',', '.'));
 						banco.cadastrarConta(new ContaCorrente(nConta, nome, saldo));
 						JOptionPane.showMessageDialog(fDialog, "Conta Cadastrada Com Sucesso!!");
-						
+						limparAtributos();
 					} catch (ContaJaCadastradaException e1) {
 						JOptionPane.showMessageDialog(fDialog, e1.getMessage());
-					}		
+					} catch (NumberFormatException	e1){
+						JOptionPane.showMessageDialog(fDialog, "Valor do saldo invalido!");
+					}
 				}else{
 					JOptionPane.showMessageDialog(fDialog, "Preencha o formulario!");
 				}

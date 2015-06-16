@@ -214,17 +214,19 @@ public class TelaModificar {
 					String stringSaldo = jFieldSaldo.getText().trim();
 					
 					double saldo = 0;
-					if(!nConta.equals("") && !nome.equals("") && !jFieldNumero.getText().trim().equals("")){
-						if(!stringSaldo.equals(""))
-							saldo = Double.parseDouble(stringSaldo.replace(',', '.'));
+					if(!nConta.equals("") && !nome.equals("") && !jFieldNumero.getText().trim().equals("")){					
 						try {
+							if(!stringSaldo.equals(""))
+								saldo = Double.parseDouble(stringSaldo.replace(',', '.'));
 							banco.atualizarConta(new ContaCorrente(id, nConta, nome, saldo));
 							JOptionPane.showMessageDialog(fDialog, "Conta atualizada com sucesso!!");
 							
 						} catch (ContaNaoEcontradaException e1) {
 							JOptionPane.showMessageDialog(fDialog, e1.getMessage());
 							limparAtributos();
-						}		
+						}  catch (NumberFormatException	e1){
+							JOptionPane.showMessageDialog(fDialog, "Valor do saldo invalido!");
+						}	
 					}else{
 						JOptionPane.showMessageDialog(fDialog, "Proibido valores vazios!");
 					}
