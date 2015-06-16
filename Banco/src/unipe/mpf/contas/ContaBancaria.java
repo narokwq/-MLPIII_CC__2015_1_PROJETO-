@@ -3,7 +3,6 @@ package unipe.mpf.contas;
 import java.io.File;
 import java.util.List;
 
-import unipe.mpf.dados.IRelatorio;
 import unipe.mpf.dados.IRepositorioContas;
 import unipe.mpf.dados.RelatorioArquivo;
 import unipe.mpf.dados.exceptions.ContaJaCadastradaException;

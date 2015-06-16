@@ -1,9 +1,7 @@
 package unipe.mpf.ui;
 
 
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.table.AbstractTableModel;
 

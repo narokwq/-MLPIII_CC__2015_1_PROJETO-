@@ -303,13 +303,13 @@ public class Principal {
 						
 						//Enviar Email
 						if(opcao == 0){
-							String email = JOptionPane.showInputDialog(jfrm,"Digite o Email.","Email", JOptionPane.PLAIN_MESSAGE);
+							final String email = JOptionPane.showInputDialog(jfrm,"Digite o Email.","Email", JOptionPane.PLAIN_MESSAGE);
 							if(email.matches("\\S+@\\S+\\.com")){
 								SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 										 @Override
 										 protected Void doInBackground() throws RelatorioNaoCriadoException {
 		
-											new RelatorioEmail(file, "lpafto@gmail.com").enviar();
+											new RelatorioEmail(file, email).enviar();
 											return null;		
 										 }
 										 protected void done() {

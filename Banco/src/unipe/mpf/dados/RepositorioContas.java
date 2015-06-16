@@ -11,7 +11,6 @@ import unipe.mpf.contas.Conta;
 import unipe.mpf.contas.ContaCorrente;
 
 public class RepositorioContas implements IRepositorioContas {
-	private final static String UNIQUE = "23505";
 
 	@Override
 	public void inserir(Conta conta){

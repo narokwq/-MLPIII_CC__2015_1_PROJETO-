@@ -9,7 +9,6 @@ import javax.swing.text.PlainDocument;
 @SuppressWarnings("serial")
 public class LimitarDouble extends PlainDocument {
 	  private String regexCheck = "(\\d+|\\.|\\,)*";
-	  private int pontos;
 
 	  public LimitarDouble() {
 	  }

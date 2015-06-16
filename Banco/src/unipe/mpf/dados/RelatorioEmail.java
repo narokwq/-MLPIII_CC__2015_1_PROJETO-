@@ -12,10 +12,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
-import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -75,7 +73,7 @@ public class RelatorioEmail implements IRelatorio{
 	    	String filename = file.getAbsolutePath();
 	    	DataSource source = new FileDataSource(filename);
 	    	messageBodyPart.setDataHandler(new DataHandler(source));
-	    	messageBodyPart.setFileName(filename);
+	    	messageBodyPart.setFileName(file.getName());
 	    	multipart.addBodyPart(messageBodyPart);
 
 	    	message.setContent(multipart);
