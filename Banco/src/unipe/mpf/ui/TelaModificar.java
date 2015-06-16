@@ -24,6 +24,7 @@ import unipe.mpf.contas.Conta;
 import unipe.mpf.contas.ContaBancaria;
 import unipe.mpf.contas.ContaCorrente;
 import unipe.mpf.dados.RepositorioContas;
+import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
 import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
 import unipe.mpf.facade.Banco;
 
@@ -33,7 +34,7 @@ public class TelaModificar {
 	private JTextField jFieldBuscaNumero;
 	private JTextField jFieldNumero;
 	private JTextField jFieldNome;
-	private JFormattedTextField jFieldSaldo;
+	private JTextField jFieldSaldo;
 	private JPanel jPanelButton;
 	private JPanel jPanelBusca;
 	private Banco banco;
@@ -44,7 +45,7 @@ public class TelaModificar {
 		jFieldBuscaNumero.setText(conta.getConta());
 		jFieldNumero.setText(conta.getConta());
 		jFieldNome.setText(conta.getNome());
-		jFieldSaldo.setValue(conta.getSaldo());
+		jFieldSaldo.setText(Double.toString(conta.getSaldo()));
 	}
 	
 	private void limparAtributos(){
@@ -179,8 +180,8 @@ public class TelaModificar {
 	}
 	
 	private void preparaFieldSaldo(GridBagConstraints gc){
-		jFieldSaldo = new JFormattedTextField(new DecimalFormat("#.##"));
-		jFieldSaldo.setColumns(6);
+		jFieldSaldo = new JTextField(6);
+		jFieldSaldo.setDocument(new LimitarDouble());
 		jPanelCadastro.add(jFieldSaldo, gc);
 	}
 	
@@ -207,16 +208,25 @@ public class TelaModificar {
 			public void actionPerformed(ActionEvent e) {
 				int opcao = JOptionPane.showConfirmDialog(fDialog, "Tem certeza que deseja editar essa conta!", "Warning", 
 														JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-				if(opcao == 0 && !jFieldNumero.getText().trim().equals("")){
-					try {
-						String nConta = jFieldNumero.getText().trim();
-						String nome = jFieldNome.getText().trim();
-						Number valor = (Number)jFieldSaldo.getValue();
-						double saldo = valor.doubleValue();
-						banco.atualizarConta(new ContaCorrente(id, nConta, nome, saldo));
-					} catch (ContaNaoEcontradaException e1) {
-						JOptionPane.showMessageDialog(fDialog, e1.getMessage());
-						limparAtributos();					
+				if(opcao == 0){
+					String nConta = jFieldNumero.getText().trim();
+					String nome = jFieldNome.getText().trim();
+					String stringSaldo = jFieldSaldo.getText().trim();
+					
+					double saldo = 0;
+					if(!nConta.equals("") && !nome.equals("") && !jFieldNumero.getText().trim().equals("")){
+						if(!stringSaldo.equals(""))
+							saldo = Double.parseDouble(stringSaldo.replace(',', '.'));
+						try {
+							banco.atualizarConta(new ContaCorrente(id, nConta, nome, saldo));
+							JOptionPane.showMessageDialog(fDialog, "Conta atualizada com sucesso!!");
+							
+						} catch (ContaNaoEcontradaException e1) {
+							JOptionPane.showMessageDialog(fDialog, e1.getMessage());
+							limparAtributos();
+						}		
+					}else{
+						JOptionPane.showMessageDialog(fDialog, "Proibido valores vazios!");
 					}
 					
 				}

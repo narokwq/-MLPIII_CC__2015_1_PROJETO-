@@ -1,10 +1,14 @@
 package unipe.mpf.contas;
 
+import java.io.File;
 import java.util.List;
 
+import unipe.mpf.dados.IRelatorio;
 import unipe.mpf.dados.IRepositorioContas;
+import unipe.mpf.dados.RelatorioArquivo;
 import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
 import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
+import unipe.mpf.dados.exceptions.RelatorioNaoCriadoException;
 
 public class ContaBancaria {
 
@@ -54,4 +58,10 @@ public class ContaBancaria {
 		return persitencia.listar(nome);
 	}
 
+	public File gerar(Conta conta, File file) throws RelatorioNaoCriadoException {
+		RelatorioArquivo relatorio = new RelatorioArquivo(conta, file);
+		relatorio.enviar();
+		return relatorio.getFile();
+	}
+	
 }

@@ -13,8 +13,7 @@ public abstract class Conta {
 		this.conta = numero;
 		this.nome = nome;
 		this.id = id;
-		if(saldo > 1)
-			creditar(saldo);
+		this.saldo = saldo;
 	}
 	
 	public Conta(String numero, String nome, double saldo){
@@ -64,12 +63,13 @@ public abstract class Conta {
 	public void creditar(double valor) {
 		this.saldo += valor;
 	}
-	
 	@Override
 	public String toString() {
-		return "Conta [nConta=" + conta + ", saldo=" + saldo + "]";
+		return "Conta [id=" + id + ", conta=" + conta + ", nome=" + nome
+				+ ", saldo=" + saldo + "]";
 	}
 
+	
 	
 	
 }

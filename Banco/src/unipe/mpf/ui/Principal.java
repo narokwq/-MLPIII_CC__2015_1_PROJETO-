@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -24,16 +26,15 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-
-
 import javax.swing.SwingWorker;
+import javax.swing.plaf.metal.MetalFileChooserUI;
 
 import unipe.mpf.contas.Conta;
 import unipe.mpf.contas.ContaBancaria;
-import unipe.mpf.contas.ContaCorrente;
+import unipe.mpf.dados.RelatorioEmail;
 import unipe.mpf.dados.RepositorioContas;
-import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
 import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
+import unipe.mpf.dados.exceptions.RelatorioNaoCriadoException;
 import unipe.mpf.facade.Banco;
 
 public class Principal {
@@ -79,7 +80,7 @@ public class Principal {
 		preparaMenuAjuda();
 		preparaMenuItemSobre();
 		preparaPainelBusca();
-		preparaLabel("Numero");
+		preparaLabel("Nome: ");
 		preparaTextFieldBusca();
 		preparaBotaoBusca();
 		preparaBotaoRemover();
@@ -91,7 +92,7 @@ public class Principal {
 	}
 	
 	private void mostraJanela() {	
-		jfrm.setMinimumSize(new Dimension(460, 300));			
+		jfrm.setMinimumSize(new Dimension(465, 300));			
 		jfrm.pack();
 		jfrm.setSize(800, 600);
 		jfrm.setLocationRelativeTo(null);
@@ -155,6 +156,15 @@ public class Principal {
 	private void preparaMenuItemSobre() {
 		JMenuItem jmenuItemSobre = new JMenuItem("Sobre");
 		jMenuAjuda.add(jmenuItemSobre);
+		jmenuItemSobre.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String message = "MidasTouch\nSistema bacario simples e eficiente.\n\nVerção: 1.0.1v\nFeito por: Allisson & Hugo";
+				JOptionPane.showMessageDialog(jfrm, message, "Sobre", JOptionPane.INFORMATION_MESSAGE);
+				
+			}
+		});
 	}
 	
 	//--------------------Painel Busca--------------------
@@ -197,14 +207,17 @@ public class Principal {
 			public void actionPerformed(ActionEvent e) {
 				int rowSelecionada = jtableConta.getSelectedRow();
 				if(rowSelecionada >= 0){
-					Conta conta = model.getContaAt(rowSelecionada);
-					try {
-						banco.removerConta(conta);
-						model.removeRow(rowSelecionada);
-					} catch (ContaNaoEcontradaException e1) {
-						JOptionPane.showMessageDialog(jfrm, "Conta não encontrada");
+					int opcao = JOptionPane.showConfirmDialog(jfrm, "Tem certeza que deseja remover essa conta!", "Warning", 
+							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+					if(opcao == 0){
+						Conta conta = model.getContaAt(rowSelecionada);
+						try {
+							banco.removerConta(conta);
+							model.removeRow(rowSelecionada);
+						} catch (ContaNaoEcontradaException e1) {
+							JOptionPane.showMessageDialog(jfrm, "Conta não encontrada");
+						}
 					}
-					
 				}else{
 					JOptionPane.showMessageDialog(jfrm, "Nenhuma conta selecionada!");
 				}
@@ -245,6 +258,32 @@ public class Principal {
 			}
 		});
 	}
+	private JFileChooser chamarFileChooser(){
+		//Preparando o FileChooser
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new java.io.File("."));
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		
+		try {
+			MetalFileChooserUI ui = (MetalFileChooserUI)fileChooser.getUI();
+			Field field = MetalFileChooserUI.class.getDeclaredField("fileNameTextField");
+			field.setAccessible(true);
+			JTextField tf = (JTextField) field.get(ui);
+			tf.setEditable(false);
+			tf.setEnabled(false);
+		} catch (NoSuchFieldException e1) {
+			e1.printStackTrace();
+		} catch (SecurityException e1) {
+			e1.printStackTrace();
+		} catch (IllegalArgumentException e1) {
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			e1.printStackTrace();
+		}
+		return fileChooser;				
+	}
 	
 	private void preparaPopMenuItemRelatorio(){
 		JMenuItem menuItemPopRelatorio = new JMenuItem("Gerar Relatorio");
@@ -253,18 +292,50 @@ public class Principal {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setCurrentDirectory(new java.io.File("."));
-				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				fileChooser.setAcceptAllFileFilterUsed(false);
+				JFileChooser fileChooser = chamarFileChooser();
+				int retorno = fileChooser.showSaveDialog(null);
+				if(retorno == JFileChooser.APPROVE_OPTION){					
+					try {
+						//Salva relatorio arquivo
+						final File file = banco.GerarRelatorio(model.getContaAt(jtableConta.getSelectedRow()), fileChooser.getSelectedFile());
+						int opcao = JOptionPane.showConfirmDialog(jfrm, "Deseja enviar um backup desse relatorio para um email?", "Warning", 
+								JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+						
+						//Enviar Email
+						if(opcao == 0){
+							String email = JOptionPane.showInputDialog(jfrm,"Digite o Email.","Email", JOptionPane.PLAIN_MESSAGE);
+							if(email.matches("\\S+@\\S+\\.com")){
+								SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+										 @Override
+										 protected Void doInBackground() throws RelatorioNaoCriadoException {
+		
+											new RelatorioEmail(file, "lpafto@gmail.com").enviar();
+											return null;		
+										 }
+										 protected void done() {
+											 try {
+												get();
+												JOptionPane.showMessageDialog(jfrm, "Email Enviado!");
+											} catch (InterruptedException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											} catch (ExecutionException e) {
+												JOptionPane.showMessageDialog(jfrm, "Não foi possivel enviar o email!");
+											}
+										 }	
+								};
+								worker.execute();	
+							}else{
+								JOptionPane.showMessageDialog(jfrm, "Formato de Email invalido!");
+							}
+						}
+						//Fim do envio do email
+						
+					} catch (RelatorioNaoCriadoException e1) {
+						JOptionPane.showMessageDialog(jfrm, e1.getMessage());
+					}
 				
-				int retorno = fileChooser.showOpenDialog(null);
-				
-				if(retorno == JFileChooser.APPROVE_OPTION){
-					System.out.println(fileChooser.getSelectedFile());
-				}
-				
-				
+				}			
 			}
 		});
 	}
@@ -293,6 +364,7 @@ public class Principal {
 	    }
 	}
 	
+	//Utilizando thread
 	private void buscarDadosThead(String conta){
 		final String BuscaConta = conta;
 		SwingWorker<List<Conta>, Void> worker = new SwingWorker<List<Conta>, Void>() {

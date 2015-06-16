@@ -30,8 +30,8 @@ public class TelaCadastrar {
 	private JPanel jPanelCadastro;
 	private JTextField jFieldNumero;
 	private JTextField jFieldNome;
-	private JFormattedTextField jFieldSaldo;
-//	private JTextField jFieldSaldo;
+//	private JFormattedTextField jFieldSaldo;
+	private JTextField jFieldSaldo;
 	private JPanel jPanelButton;
 	
 	public TelaCadastrar(JFrame pai){
@@ -111,8 +111,8 @@ public class TelaCadastrar {
 	}
 	
 	private void preparaFieldSaldo(GridBagConstraints gc){
-		jFieldSaldo = new JFormattedTextField(new DecimalFormat("#.##"));
-		jFieldSaldo.setColumns(6);
+		jFieldSaldo = new JTextField(6);
+		jFieldSaldo.setDocument(new LimitarDouble());
 		jPanelCadastro.add(jFieldSaldo, gc);
 	}
 	
@@ -137,14 +137,22 @@ public class TelaCadastrar {
 				Banco banco = new Banco(new ContaBancaria(new RepositorioContas()));
 				String nConta = jFieldNumero.getText().trim();
 				String nome = jFieldNome.getText().trim();
-				double saldo = Double.parseDouble(jFieldSaldo.getText().trim());
-				try {
-					banco.cadastrarConta(new ContaCorrente(nConta, nome, saldo));
-					JOptionPane.showMessageDialog(fDialog, "Conta Cadastrada Com Sucesso!!");
-					
-				} catch (ContaJaCadastradaException e1) {
-					JOptionPane.showMessageDialog(fDialog, e1.getMessage());
-				}			
+				String stringSaldo = jFieldSaldo.getText().trim();
+				
+				double saldo = 0;
+				if(!nConta.equals("") && !nome.equals("")){
+					if(!stringSaldo.equals(""))
+						saldo = Double.parseDouble(stringSaldo.replace(',', '.'));
+					try {
+						banco.cadastrarConta(new ContaCorrente(nConta, nome, saldo));
+						JOptionPane.showMessageDialog(fDialog, "Conta Cadastrada Com Sucesso!!");
+						
+					} catch (ContaJaCadastradaException e1) {
+						JOptionPane.showMessageDialog(fDialog, e1.getMessage());
+					}		
+				}else{
+					JOptionPane.showMessageDialog(fDialog, "Preencha o formulario!");
+				}
 			}
 		});
 	}
