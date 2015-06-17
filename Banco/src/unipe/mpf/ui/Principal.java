@@ -251,7 +251,6 @@ public class Principal {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(jtableConta.getSelectedRow());
 				Conta conta = model.getContaAt(jtableConta.getSelectedRow());
 				new TelaModificar(jfrm, conta).mostarTela();
 				
@@ -309,7 +308,7 @@ public class Principal {
 										 @Override
 										 protected Void doInBackground() throws RelatorioNaoCriadoException {
 		
-											new RelatorioEmail(file, email).enviar();
+											banco.GerarRelatorio(email, file);
 											return null;		
 										 }
 										 protected void done() {

@@ -42,4 +42,8 @@ public class Banco {
 	public File GerarRelatorio(Conta conta, File file) throws RelatorioNaoCriadoException {
 		return contaBancaria.gerar(conta, file);	
 	}
+	
+	public void GerarRelatorio(String email, File file) throws RelatorioNaoCriadoException {
+		contaBancaria.gerarEmail(email, file);	
+	}
 }

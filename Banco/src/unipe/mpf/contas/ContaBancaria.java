@@ -5,6 +5,7 @@ import java.util.List;
 
 import unipe.mpf.dados.IRepositorioContas;
 import unipe.mpf.dados.RelatorioArquivo;
+import unipe.mpf.dados.RelatorioEmail;
 import unipe.mpf.dados.exceptions.ContaJaCadastradaException;
 import unipe.mpf.dados.exceptions.ContaNaoEcontradaException;
 import unipe.mpf.dados.exceptions.RelatorioNaoCriadoException;
@@ -61,6 +62,11 @@ public class ContaBancaria {
 		RelatorioArquivo relatorio = new RelatorioArquivo(conta, file);
 		relatorio.enviar();
 		return relatorio.getFile();
+	}
+	
+	public void gerarEmail(String email, File file) throws RelatorioNaoCriadoException {
+		RelatorioEmail relatorio = new RelatorioEmail(file, email);
+		relatorio.enviar();
 	}
 	
 }
